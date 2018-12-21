@@ -1,10 +1,8 @@
 <template>
   <div class="app-container">
-    <h1>
-      此处模拟前端页面的提交
-    </h1>
-    <div style="margin: 20px;"/>
+    <h1>这是前台展示测试</h1>
 
+    <div style="margin: 20px;"/>
     <el-form v-loading="loading" ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="80px" style="width: 80%; margin-left:50px;">
       <el-form-item label="标题" prop="title">
         <el-input v-model.trim="temp.title"/>
@@ -36,7 +34,7 @@
 import { save } from '@/api/leavemes'
 
 export default {
-  name: 'LeavemesTest',
+  name: 'AddLeavemes',
   data() {
     return {
       temp: {
@@ -55,7 +53,8 @@ export default {
           { min: 1, max: 150, message: '长度在150字符以内', trigger: 'blur' }
         ],
         name: [
-          { required: true, message: '请填写姓名', trigger: 'blur' }
+          { required: true, message: '请填写姓名(100字符以内)', trigger: 'blur' },
+          { min: 1, max: 100, message: '长度在100字符以内', trigger: 'blur' }
         ],
         mobile: [
           { required: true, message: '请填写手机号码', trigger: 'blur' },
@@ -74,7 +73,8 @@ export default {
           { type: 'email', message: '请输入正确的email地址', trigger: ['blur', 'change'] }
         ],
         address: [
-          { required: true, message: '请填写地址', trigger: 'blur' }
+          { required: true, message: '请填写地址(200字符以内)', trigger: 'blur' },
+          { min: 1, max: 200, message: '长度在200字符以内', trigger: 'blur' }
         ],
         content: [
           { required: true, message: '请填写留言内容(500字符以内)', trigger: 'blur' },
@@ -115,7 +115,6 @@ export default {
     }
   }
 }
-
 </script>
 
 <style scoped>

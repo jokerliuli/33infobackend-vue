@@ -34,7 +34,7 @@
       <el-table-column fixed="left" sortable="custom" prop="updateDate" label="修改时间 " width="152px"/>
       <el-table-column :show-overflow-tooltip="true" label="标题" width="132px">
         <template slot-scope="scope">
-          <span class="link-type" @click="handleUpdate(scope.row)">{{ scope.row.title }}</span>
+          <span class="link-type" @click="handleUpdate(scope.row.id)">{{ scope.row.title }}</span>
         </template>
       </el-table-column>
       <el-table-column :show-overflow-tooltip="true" prop="shortTitle" label="简略标题"/>
@@ -56,7 +56,7 @@
 
       <el-table-column fixed="right" label="操作" align="center" width="230" class-name="small-padding fixed-width">
         <template slot-scope="scope">
-          <el-button type="primary" size="mini" @click="handleUpdate(scope.row)">编辑</el-button>
+          <el-button type="primary" size="mini" @click="handleUpdate(scope.row.id)">编辑</el-button>
           <el-button v-if="scope.row.publishStatus!='2'" size="mini" type="success" @click="handleModifyStatus(scope.row, 2)">发布
           </el-button>
           <el-button v-if="scope.row.publishStatus!='1'" size="mini" @click="handleModifyStatus(scope.row, 1)">草稿
@@ -74,10 +74,11 @@
 </template>
 
 <script>
-import { getpage, update, remove } from '@/api/information'
+import { getPage, update, remove } from '@/api/information'
 import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
 
 export default {
+  name: 'Information',
   components: { Pagination },
   filters: {
     statusFilter(publishStatus) {
@@ -182,9 +183,8 @@ export default {
     handleCreate() {
       this.$router.push({ path: '/information/addInformation' })
     },
-    handleUpdate(row) {
-      this.temp = Object.assign({}, row) // copy obj
-      this.$router.push({ path: '/information/addInformation', query: { editRow: this.temp }})
+    handleUpdate(id) {
+      this.$router.push({ path: '/information/addInformation', query: { id: id }})
     },
     handleFilter() {
       this.listQuery.page = 1
@@ -192,7 +192,7 @@ export default {
     },
     getListBypage() {
       this.loading = true
-      getpage(this.listQuery).then(response => {
+      getPage(this.listQuery).then(response => {
         this.informationList = response.data.data.records
         this.total = response.data.data.total
         this.loading = false

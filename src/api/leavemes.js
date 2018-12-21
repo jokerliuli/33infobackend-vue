@@ -1,6 +1,6 @@
 import request from '../utils/request'
 
-export function getpage(query) {
+export function getPage(query) {
   return request({
     url: '/admin/leavemes/page',
     method: 'post',

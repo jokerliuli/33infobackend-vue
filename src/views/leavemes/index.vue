@@ -1,7 +1,5 @@
 <template>
-
   <div class="app-container">
-
     <div class="filter-container">
       <el-input v-model="listQuery.content" clearable placeholder="留言内容" style="width: 200px;" class="filter-item" />
       <el-date-picker
@@ -19,9 +17,8 @@
       <!--<el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate" >新增</el-button>-->
     </div>
     <div style="margin: 20px;"/>
-
     <el-table
-      v-loading.fullscreen.lock="loading"
+      v-loading="loading"
       :data="leavemesList"
       :default-sort = "{prop: 'updateDate', order: 'descending'}"
       border
@@ -48,9 +45,7 @@
       </el-table-column>
     </el-table>
     <div style="margin: 20px;"/>
-
     <pagination v-show="total>0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" @pagination="getListBypage" />
-
     <el-dialog :visible.sync="dialogFormVisible" title="留言管理" width="35%">
       <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="80px" style="width: 80%; margin-left:50px;">
         <el-form-item label="标题" prop="title">
@@ -74,15 +69,14 @@
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">取消</el-button>
-        <el-button type="primary" @click="updateData()">确定</el-button>
+        <el-button :loading="buttonLoading" type="primary" @click="updateData()">确定</el-button>
       </div>
     </el-dialog>
-
   </div>
 </template>
 
 <script>
-import { getpage, update, remove } from '@/api/leavemes'
+import { getPage, update, remove } from '@/api/leavemes'
 import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
 
 export default {
@@ -92,6 +86,7 @@ export default {
     return {
       dialogFormVisible: false,
       loading: false,
+      buttonLoading: true,
       total: 0,
       timeRange: undefined,
       rules: {
@@ -185,9 +180,8 @@ export default {
     updateData() {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
-          this.loading = true
+          this.buttonLoading = true
           update(this.temp).then(() => {
-            this.loading = false
             this.dialogFormVisible = false
             this.$notify({
               title: '成功',
@@ -201,6 +195,7 @@ export default {
       })
     },
     handleUpdate(row) {
+      this.buttonLoading = false
       this.temp = Object.assign({}, row) // copy obj
       this.dialogFormVisible = true
     },
@@ -214,7 +209,7 @@ export default {
     },
     getListBypage() {
       this.loading = true
-      getpage(this.listQuery).then(response => {
+      getPage(this.listQuery).then(response => {
         this.leavemesList = response.data.data.records
         this.total = response.data.data.total
         this.loading = false

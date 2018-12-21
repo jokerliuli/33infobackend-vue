@@ -8,7 +8,7 @@
         <el-input v-model.trim="temp.shortTitle"/>
       </el-form-item>
       <el-form-item label="分类栏目" prop="informationType">
-        <el-select v-model="temp.informationType" placeholder="分类栏目" clearable class="filter-item" >
+        <el-select v-model="temp.informationType" placeholder="分类栏目" clearable class="filter-item" style="width: 110px">
           <el-option
             v-for="item in informationTypeOptions"
             :key="item.value"
@@ -21,15 +21,17 @@
       </el-form-item>
       <el-form-item label="缩略图" prop="thumbnail">
         <el-upload
-          :on-preview="handlePreview"
-          :on-remove="handleRemove"
-          :file-list="fileList2"
-          :limit="1"
+          ref="upload"
+          :http-request="handleUpload"
+          :show-file-list="false"
+          action=""
           class="upload-demo"
-          action="https://jsonplaceholder.typicode.com/posts/"
           list-type="picture">
-          <el-button size="small" type="primary">点击上传</el-button>
-          <div slot="tip" class="el-upload__tip">（暂时未完成）只能上传一张jpg/png文件，且不超过500kb</div>
+          <el-button slot="trigger" size="small" type="primary">上传图片</el-button>
+          <div slot="tip" class="el-upload__tip">
+            <img :src="temp.thumbnail">
+          </div>
+          <div slot="tip" class="el-upload__tip">只能上传一张jpg/png文件，且不超过500kb</div>
         </el-upload>
       </el-form-item>
       <el-form-item label="文章摘要" prop="summary">
@@ -56,24 +58,22 @@
       </el-form-item>
       <el-form-item style="float:right">
         <el-button @click="backToIndex()">返回列表</el-button>
-        <el-button type="primary" @click="createData()">立即创建</el-button>
+        <el-button type="primary" @click="createData()">立即提交</el-button>
       </el-form-item>
     </el-form>
 </div></template>
 
 <script>
 import Tinymce from '@/components/Tinymce'
-import { save, update } from '@/api/information'
+import { save, update, upload, getOne } from '@/api/information'
 
 export default {
   name: 'AddInformation',
   components: { Tinymce },
   data() {
     return {
+      id: '',
       loading: false,
-      fileList2: [
-        { name: 'food.jpeg', url: 'https://fuss10.elemecdn.com/3/63/4e7f3a15429bfda99bce42a18cdd1jpeg.jpeg?imageMogr2/thumbnail/360x360/format/webp/quality/100' }
-      ],
       test: '1',
       informationTypeOptions: [
         // 新闻动态，产品方案，成功案例
@@ -91,7 +91,18 @@ export default {
         shortTitle: '',
         informationType: 1,
         author: '',
-        thumbnail: '',
+        thumbnail: 'https://joker-1256309280.cos.ap-shanghai.myqcloud.com/demo/static/icon.png',
+        summary: '',
+        keyword: '',
+        publishStatus: 1,
+        content: ''
+      },
+      resetTemp: {
+        title: '',
+        shortTitle: '',
+        informationType: 1,
+        author: '',
+        thumbnail: 'https://joker-1256309280.cos.ap-shanghai.myqcloud.com/demo/static/icon.png',
         summary: '',
         keyword: '',
         publishStatus: 1,
@@ -117,19 +128,74 @@ export default {
       }
     }
   },
+  watch: {
+    '$route': 'getParams'
+  },
   created() {
-    if (this.$route.query.editRow != null) {
-      this.temp = this.$route.query.editRow
-    }
+    this.getParams()
   },
   methods: {
+    getParams() {
+      const id = this.$route.query.id
+      if (id != null) {
+        this.id = id
+        this.loading = true
+        getOne({ id: this.id }).then(response => {
+          const result = response.data.data
+          this.temp = result
+          this.loading = false
+          // this.$notify({
+          //   title: '成功',
+          //   message: '图片上传成功',
+          //   type: 'success',
+          //   duration: 2000
+          // })
+        }).catch(err => {
+          this.loading = false
+          console.error(err)
+          this.$message({
+            message: '请求超时，请重试',
+            type: 'error'
+          })
+        })
+      } else {
+        this.temp = this.resetTemp
+      }
+    },
+    handleUpload(param) {
+      this.loading = true
+      const fileObj = param.file
+      // 接收上传文件的后台地址
+      // FormData 对象
+      const form = new FormData()
+      // 文件对象
+      form.append('file', fileObj)
+      upload(form).then(response => {
+        const result = response.data.data
+        this.temp.thumbnail = result
+        this.loading = false
+        this.$notify({
+          title: '成功',
+          message: '图片上传成功',
+          type: 'success',
+          duration: 2000
+        })
+      }).catch(err => {
+        this.loading = false
+        console.error(err)
+        this.$message({
+          message: '请求超时，请重试',
+          type: 'error'
+        })
+      })
+    },
     backToIndex() {
       this.$router.push({ path: '/information/information' })
     },
     createData() {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
-          if (this.$route.query.editRow != null) {
+          if (this.$route.query.id != null) {
             this.loading = true
             update(this.temp).then(() => {
               this.loading = false
@@ -159,12 +225,6 @@ export default {
     },
     resetForm(formName) {
       this.$refs[formName].resetFields()
-    },
-    handleRemove(file, fileList) {
-      console.log(file, fileList)
-    },
-    handlePreview(file) {
-      console.log(file)
     }
   }
 
