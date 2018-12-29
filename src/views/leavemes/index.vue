@@ -136,7 +136,7 @@ export default {
         endTime: undefined,
         content: undefined,
         prop: 'updateDate',
-        order: 'descending'
+        order: 'Desc'
       },
       leavemesList: [],
       pickerOptions2: {
@@ -246,11 +246,6 @@ export default {
             type: 'error'
           })
         })
-      }).catch(() => {
-        // this.$message({
-        //   type: 'info',
-        //   message: '已取消删除'
-        // })
       })
     }
   }

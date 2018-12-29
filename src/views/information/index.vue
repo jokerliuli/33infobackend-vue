@@ -32,7 +32,7 @@
     >
       <el-table-column fixed="left" sortable="custom" prop="id" label="ID" width="65px"/>
       <el-table-column fixed="left" sortable="custom" prop="updateDate" label="修改时间 " width="152px"/>
-      <el-table-column :show-overflow-tooltip="true" label="标题" width="132px">
+      <el-table-column :show-overflow-tooltip="true" label="标题" width="250px">
         <template slot-scope="scope">
           <span class="link-type" @click="handleUpdate(scope.row.id)">{{ scope.row.title }}</span>
         </template>
@@ -134,7 +134,8 @@ export default {
         title: undefined,
         informationType: undefined,
         prop: 'updateDate',
-        order: 'descending'
+        // Desc降序，Asc升序
+        order: 'Desc'
       },
       temp: {
         title: '',

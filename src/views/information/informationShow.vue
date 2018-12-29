@@ -31,7 +31,7 @@ export default {
         title: undefined,
         informationType: undefined,
         prop: 'updateDate',
-        order: 'descending'
+        order: 'Desc'
       }
     }
   },

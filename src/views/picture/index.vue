@@ -24,32 +24,122 @@
 
     <div style="margin: 20px;"/>
 
+    <el-table
+      v-loading="loading"
+      :data="pcituresList"
+      :default-sort = "{prop: 'updateDate', order: 'descending'}"
+      border
+      style="width: 100%"
+      @sort-change="sortChange">
+      <el-table-column fixed="left" sortable="custom" prop="id" label="ID" width="50px"/>
+      <el-table-column fixed="left" sortable="custom" prop="updateDate" label="更新时间" width="152px"/>
+      <el-table-column :show-overflow-tooltip="true" prop="pictureName" label="图片名称" width="250px"/>
+      <el-table-column prop="pictureSize" label="大小" width="82px"/>
+      <el-table-column prop="pictureDimension" label="尺寸" width="82px"/>
+      <el-table-column :show-overflow-tooltip="true" prop="pictureUrl" label="url"/>
+      <el-table-column :show-overflow-tooltip="true" prop="pictureKey" label="key"/>
+      <el-table-column fixed="right" prop="status" label="启用状态" width="82px"/>
+      <el-table-column fixed="right" label="操作" align="center" width="230" class-name="small-padding fixed-width">
+        <template slot-scope="scope">
+          <!--<el-button type="primary" size="mini" @click="handleUpdate(scope.row)">编辑</el-button>-->
+          <el-button size="mini" type="danger" @click="handleDelete(scope.row)">彻底删除
+          </el-button>
+        </template>
+      </el-table-column>
+    </el-table>
+    <div style="margin: 20px;"/>
+
+    <pagination v-show="total>0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" @pagination="getListBypage" />
+
   </div>
 </template>
 
 <script>
 import { upload } from '@/api/information'
+import { remove, getPage } from '@/api/picture'
+import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
 
 export default {
   name: 'Picture',
+  components: { Pagination },
   data() {
     return {
+      loading: false,
       statusOptions: [
         // 新闻动态，产品方案，成功案例
         { value: 0, label: '启用中' },
         { value: 1, label: '未启用' }
       ],
+      total: 0,
       listQuery: {
         page: 1,
         limit: 10,
         pictureName: undefined,
         prop: 'id',
-        order: 'descending',
+        order: 'Desc',
         status: undefined
-      }
+      },
+      pcituresList: []
     }
   },
+  created() {
+    this.getListBypage()
+  },
   methods: {
+    getListBypage() {
+      this.loading = true
+      getPage(this.listQuery).then(response => {
+        this.pcituresList = response.data.data.records
+        this.total = response.data.data.total
+        this.loading = false
+      }).catch(err => {
+        this.loading = false
+        console.error(err)
+        this.$message({
+          message: '请求超时，请重试',
+          type: 'error'
+        })
+      })
+    },
+    handleFilter() {
+      if (this.timeRange != null) {
+        this.listQuery.startTime = this.timeRange[0]
+        this.listQuery.endTime = this.timeRange[1]
+      }
+      this.listQuery.page = 1
+      this.getListBypage()
+    },
+    handleDelete(row) {
+      this.$confirm('是否删除?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        this.loading = true
+        remove(row).then(response => {
+          this.loading = false
+          this.$notify({
+            title: '成功',
+            message: '删除成功',
+            type: 'success',
+            duration: 2000
+          })
+          this.getListBypage()
+        }).catch(err => {
+          this.loading = false
+          console.error(err)
+          this.$message({
+            message: '请求超时，请重试',
+            type: 'error'
+          })
+        })
+      })
+    },
+    sortChange(data) {
+      this.listQuery.prop = data.prop
+      this.listQuery.order = data.order
+      this.handleFilter()
+    },
     handleUpload(param) {
       this.loading = true
       const fileObj = param.file
