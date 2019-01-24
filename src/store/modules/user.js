@@ -1,6 +1,5 @@
 import { login, logout, getInfo } from '@/api/login'
 import { getToken, setToken, removeToken } from '@/utils/auth'
-import { Message } from 'element-ui'
 
 const user = {
   state: {
@@ -31,20 +30,10 @@ const user = {
       // const username = userInfo.username.trim()
       return new Promise((resolve, reject) => {
         login(userInfo).then(response => {
-          const code = response.data.code
-          if (code === 10000) {
-            Message({
-              message: response.data.msg,
-              type: 'error',
-              duration: 5 * 1000
-            })
-            resolve()
-          } else {
-            const data = response.data.data
-            commit('SET_TOKEN', data.token)
-            setToken(data.token)
-            resolve()
-          }
+          const data = response.data.data
+          commit('SET_TOKEN', data.token)
+          setToken(data.token)
+          resolve()
         }).catch(error => {
           reject(error)
         })

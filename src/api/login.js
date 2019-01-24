@@ -14,6 +14,13 @@ export function getInfo() {
     method: 'get'
   })
 }
+export function getMenu(data) {
+  return request({
+    url: '/admin/menuByRoles',
+    method: 'post',
+    data
+  })
+}
 // export function getInfo(token) {
 //   return request({
 //     url: '/admin/info',
@@ -23,7 +30,8 @@ export function getInfo() {
 // }
 export function logout() {
   return request({
-    url: 'admin/logout',
+    url: '/admin/logout',
     method: 'post'
   })
 }
+

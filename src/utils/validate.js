@@ -30,3 +30,11 @@ export function validatAlphabets(str) {
   const reg = /^[A-Za-z]+$/
   return reg.test(str)
 }
+/* 对象为空*/
+export function validatenull(str) {
+  if (!str) {
+    return true
+  } else {
+    return false
+  }
+}
