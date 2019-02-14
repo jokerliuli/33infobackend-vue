@@ -27,7 +27,7 @@
     <el-table
       v-loading="loading"
       :data="pcituresList"
-      :default-sort = "{prop: 'updateDate', order: 'descending'}"
+      :default-sort = "{prop: 'id', order: 'descending'}"
       border
       style="width: 100%"
       @sort-change="sortChange">
@@ -41,7 +41,7 @@
       <el-table-column fixed="right" prop="status" label="启用状态" width="82px"/>
       <el-table-column fixed="right" label="操作" align="center" width="230" class-name="small-padding fixed-width">
         <template slot-scope="scope">
-          <!--<el-button type="primary" size="mini" @click="handleUpdate(scope.row)">编辑</el-button>-->
+          <el-button type="primary" size="mini" @click="handleUpdate(scope.row)">编辑</el-button>
           <el-button size="mini" type="danger" @click="handleDelete(scope.row)">彻底删除
           </el-button>
         </template>
@@ -66,7 +66,6 @@ export default {
     return {
       loading: false,
       statusOptions: [
-        // 新闻动态，产品方案，成功案例
         { value: 0, label: '启用中' },
         { value: 1, label: '未启用' }
       ],
@@ -149,8 +148,9 @@ export default {
       // 文件对象
       form.append('file', fileObj)
       upload(form).then(response => {
-        const result = response.data.data
-        this.temp.thumbnail = result
+        // const result = response.data.data
+        // console.log('result:' + result)
+        // this.temp.thumbnail = result
         this.loading = false
         this.$notify({
           title: '成功',
@@ -158,6 +158,7 @@ export default {
           type: 'success',
           duration: 2000
         })
+        this.getListBypage()
       }).catch(err => {
         this.loading = false
         console.error(err)
