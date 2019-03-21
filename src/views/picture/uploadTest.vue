@@ -8,11 +8,11 @@
         :file-list="fileList"
         :show-file-list="true"
         :on-remove="handleRemove"
+        :on-success="handleSuccess"
         :before-upload="beforeUpload"
         :http-request="handleUpload"
-        :on-progress="uploadProgress"
-        action="base"
         class="editor-slide-upload"
+        action="https://httpbin.org/post"
         list-type="picture-card">
         <el-button size="small" type="primary">点击上传</el-button>
       </el-upload>
@@ -42,6 +42,30 @@ export default {
     }
   },
   methods: {
+    handleUpload(param) {
+      const fileObj = param.file
+      // 接收上传文件的后台地址
+      // FormData 对象
+      const form = new FormData()
+      // 文件对象
+      form.append('file', fileObj)
+      qiniuupload(form).then(response => {
+        this.handleSuccess(response, fileObj)
+        this.$notify({
+          title: '成功',
+          message: '图片上传成功',
+          type: 'success',
+          duration: 2000
+        })
+      }).catch(err => {
+        this.loading = false
+        console.error(err)
+        this.$message({
+          message: '请求超时，请重试',
+          type: 'error'
+        })
+      })
+    },
     checkAllSuccess() {
       return Object.keys(this.listObj).every(item => this.listObj[item].hasSuccess)
     },
@@ -61,7 +85,7 @@ export default {
       const objKeyArr = Object.keys(this.listObj)
       for (let i = 0, len = objKeyArr.length; i < len; i++) {
         if (this.listObj[objKeyArr[i]].uid === uid) {
-          this.listObj[objKeyArr[i]].url = response.data.data
+          this.listObj[objKeyArr[i]].url = response.files.file
           this.listObj[objKeyArr[i]].hasSuccess = true
           return
         }
@@ -76,37 +100,6 @@ export default {
           return
         }
       }
-    },
-    handleUpload(param) {
-      const fileObj = param.file
-      // 接收上传文件的后台地址
-      // FormData 对象
-      const form = new FormData()
-      // 文件对象
-      form.append('file', fileObj)
-      qiniuupload(form).then(response => {
-        console.log(response)
-        this.handleSuccess(response, fileObj)
-        this.$notify({
-          title: '成功',
-          message: '图片上传成功',
-          type: 'success',
-          duration: 2000
-        })
-      }).catch(err => {
-        this.loading = false
-        console.error(err)
-        this.$message({
-          message: '请求超时，请重试',
-          type: 'error'
-        })
-      })
-    },
-    uploadProgress(event, file, fileList) {
-      console.log('uploadProgress')
-      console.log(event)
-      console.log(file)
-      console.log(fileList)
     },
     beforeUpload(file) {
       const _self = this
@@ -126,11 +119,11 @@ export default {
 }
 </script>
 
-  <style rel="stylesheet/scss" lang="scss" scoped>
-.editor-slide-upload {
-  margin-bottom: 20px;
-  /deep/ .el-upload--picture-card {
-    width: 100%;
+<style rel="stylesheet/scss" lang="scss" scoped>
+  .editor-slide-upload {
+    margin-bottom: 20px;
+    /deep/ .el-upload--picture-card {
+      width: 100%;
+    }
   }
-}
 </style>

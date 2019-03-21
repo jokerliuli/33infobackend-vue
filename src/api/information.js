@@ -40,13 +40,21 @@ export function remove(data) {
   })
 }
 
-export function upload(data) {
+// export function upload(form) {
+//   return request({
+//     url: '/admin/upload/tengxun',
+//     method: 'post',
+//     headers: {
+//       'Content-Type': 'multipart/form-data'
+//     },
+//     form
+//   })
+// }
+
+export function qiniuupload(data) {
   return request({
-    url: '/admin/upload/tengxun',
+    url: '/admin/upload/qiniu',
     method: 'post',
-    headers: {
-      'Content-Type': 'multipart/form-data'
-    },
     data
   })
 }

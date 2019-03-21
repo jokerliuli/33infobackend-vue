@@ -136,7 +136,7 @@ export default {
         endTime: undefined,
         content: undefined,
         prop: 'updateDate',
-        order: 'Desc'
+        order: 'descending'
       },
       leavemesList: [],
       pickerOptions2: {

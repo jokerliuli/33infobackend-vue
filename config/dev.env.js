@@ -10,4 +10,6 @@ module.exports = merge(prodEnv, {
   BASE_API: '"http://localhost:8090"'
   // 腾讯云环境
   // BASE_API: '"http://139.199.82.83:8090"'
+  // 3阿里云环境
+  // BASE_API: '"http://47.100.27.31:8090"'
 })

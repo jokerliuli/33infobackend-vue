@@ -135,7 +135,7 @@ export default {
         informationType: undefined,
         prop: 'updateDate',
         // Desc降序，Asc升序
-        order: 'Desc'
+        order: 'descending'
       },
       temp: {
         title: '',

@@ -39,8 +39,8 @@ export default {
   data() {
     return {
       loginForm: {
-        username: 'alex',
-        password: '123'
+        username: '',
+        password: ''
       },
       loginRules: {
         username: [{ required: true, message: '请输入账号', trigger: 'blur' }],

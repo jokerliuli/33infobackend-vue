@@ -7,17 +7,11 @@
       <el-form-item label="简略标题" prop="shortTitle">
         <el-input v-model.trim="temp.shortTitle"/>
       </el-form-item>
-      <el-form-item label="分类栏目" prop="informationType">
-        <el-select v-model="temp.informationType" placeholder="分类栏目" clearable class="filter-item" style="width: 110px">
-          <el-option
-            v-for="item in informationTypeOptions"
-            :key="item.value"
-            :label="item.label"
-            :value="item.value"/>
-        </el-select>
-      </el-form-item>
       <el-form-item label="文章作者" prop="author">
         <el-input v-model.trim="temp.author"/>
+      </el-form-item>
+      <el-form-item label="排序" prop="sort">
+        <el-input v-model.number="temp.sort"/>
       </el-form-item>
       <el-form-item label="缩略图" prop="thumbnail">
         <el-upload
@@ -58,55 +52,29 @@
       </el-form-item>
       <el-form-item style="float:right">
         <el-button @click="backToIndex()">返回列表</el-button>
-        <el-button type="primary" @click="createData()">立即提交</el-button>
+        <el-button type="primary" @click="createData()">立即更新</el-button>
       </el-form-item>
     </el-form>
 </div></template>
 
 <script>
 import Tinymce from '@/components/Tinymce'
-import { save, update, qiniuupload, getOne } from '@/api/information'
-
+import { update, getOne } from '@/api/trade'
+import { qiniuupload } from '@/api/information'
 export default {
-  name: 'AddInformation',
+  name: 'EditSuccess',
   components: { Tinymce },
   data() {
     return {
       id: '',
       loading: false,
       test: '1',
-      informationTypeOptions: [
-        // 新闻动态，产品方案，成功案例
-        { value: 1, label: '新闻动态' },
-        { value: 2, label: '产品方案' },
-        { value: 3, label: '成功案例' }
-      ],
       publishStatusOptions: [
         // 新闻动态，产品方案，成功案例
         { value: 1, label: '草稿' },
         { value: 2, label: '发布' }
       ],
       temp: {
-        title: '',
-        shortTitle: '',
-        informationType: 1,
-        author: '',
-        thumbnail: 'https://joker-1256309280.cos.ap-shanghai.myqcloud.com/demo/static/icon.png',
-        summary: '',
-        keyword: '',
-        publishStatus: 1,
-        content: ''
-      },
-      resetTemp: {
-        title: '',
-        shortTitle: '',
-        informationType: 1,
-        author: '',
-        thumbnail: 'https://joker-1256309280.cos.ap-shanghai.myqcloud.com/demo/static/icon.png',
-        summary: '',
-        keyword: '',
-        publishStatus: 1,
-        content: ''
       },
       rules: {
         title: [
@@ -116,20 +84,18 @@ export default {
         shortTitle: [
           { required: true, message: '请填写缩略标题', trigger: 'blur' }
         ],
-        informationType: [
-          { required: true, message: '请选择分类栏目', trigger: 'blur' }
-        ],
         publishStatus: [
           { required: true, message: '请选择发布状态', trigger: 'blur' }
         ],
         content: [
           { required: true, message: '请填写博客文章内容', trigger: 'blur' }
+        ],
+        sort: [
+          { required: true, message: '请填写排序（数字，从1开始）', trigger: 'blur' },
+          { type: 'number', message: '排序必须为数字值' }
         ]
       }
     }
-  },
-  watch: {
-    '$route': 'getParams'
   },
   created() {
     this.getParams()
@@ -190,44 +156,26 @@ export default {
       })
     },
     backToIndex() {
-      this.$router.push({ path: '/information/information' })
+      this.$router.push({ path: '/information/trade' })
     },
     createData() {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
-          if (this.$route.query.id != null) {
-            this.loading = true
-            update(this.temp).then(() => {
-              this.loading = false
-              this.$notify({
-                title: '成功',
-                message: '更新成功',
-                type: 'success',
-                duration: 2000
-              })
-              this.$router.push({ path: '/information/information' })
+          this.loading = true
+          update(this.temp).then(() => {
+            this.loading = false
+            this.$notify({
+              title: '成功',
+              message: '更新成功',
+              type: 'success',
+              duration: 2000
             })
-          } else {
-            this.loading = true
-            save(this.temp).then(() => {
-              this.loading = false
-              this.$notify({
-                title: '成功',
-                message: '创建成功',
-                type: 'success',
-                duration: 2000
-              })
-              this.$router.push({ path: '/information/information' })
-            })
-          }
+            this.$router.push({ path: '/information/trade' })
+          })
         }
       })
-    },
-    resetForm(formName) {
-      this.$refs[formName].resetFields()
     }
   }
-
 }
 </script>
 
